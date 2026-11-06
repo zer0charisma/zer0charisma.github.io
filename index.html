@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Clark’s Profile | zer0space</title>
+<title>Natalie’s Profile | zer0space</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌈</text></svg>">
 <style>
 /* ===== Colors: edit these to re-theme the whole page ===== */
@@ -103,6 +103,8 @@ table.details td { background: var(--box-blue-light); }
 .player.playing .eq i { animation: eq .6s ease-in-out infinite alternate; }
 .player .eq i:nth-child(2) { animation-delay: .15s; } .player .eq i:nth-child(3) { animation-delay: .3s; } .player .eq i:nth-child(4) { animation-delay: .45s; }
 @keyframes eq { to { height: 16px; } }
+.video { aspect-ratio: 16 / 9; background: #000; }
+.video iframe { width: 100%; height: 100%; border: 0; display: block; }
 
 /* Right column */
 .network { border: 1px solid var(--border); padding: 12px; text-align: center; font-size: 14px; font-weight: bold; margin-bottom: 12px; }
@@ -142,7 +144,7 @@ footer { text-align: center; padding: 14px; font-size: 10px; color: var(--muted)
         <img id="avatar" alt="Profile picture">
         <div>
           <p class="tagline" id="tagline"></p>
-          <p>Software Engineer</p>
+          <p id="headline"></p>
           <p id="location"></p>
           <p class="online">Online Now!</p>
           <p class="small">Last commit: <span id="lastLogin">checking…</span></p>
@@ -171,6 +173,8 @@ footer { text-align: center; padding: 14px; font-size: 10px; color: var(--muted)
           <div><div id="songTitle"></div><div id="songArtist" class="small" style="color:#6c6"></div></div>
           <div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
         </div>
+        <div id="video" class="video" hidden></div>
+        <p class="in small" style="margin:0"><a id="songLink" href="#" target="_blank" rel="noopener">Open on YouTube</a></p>
       </div>
 
       <div class="box">
@@ -236,22 +240,23 @@ footer { text-align: center; padding: 14px; font-size: 10px; color: var(--muted)
    EDIT EVERYTHING IN THIS BLOCK — the rest of the page reads from it
    ========================================================= */
 const PROFILE = {
-  name: "Clark",
+  name: "Natalie",
+  headline: "Software Engineer",                             // line under your tagline
   github: "zer0charisma",
   tagline: "\u201CTesting in production since 2006.\u201D",   // your tagline here
   location: "Your City, State",                              // or "" to hide
   email: "",            // e.g. "you@example.com" — leave "" to hide the link
   linkedin: "",         // e.g. "https://www.linkedin.com/in/yourname"
   song: {
-    file: "",           // put an mp3 in the repo, e.g. "song.mp3"
-    title: "Your song title",
-    artist: "Your artist"
+    youtube: "vc6vs-l5dkc",   // the part after "watch?v=" in a YouTube link
+    title: "I Write Sins Not Tragedies",
+    artist: "Panic! at the Disco"
   },
   details: [
     ["Status:", "Looking for my next role"],
     ["Here for:", "Networking, new opportunities"],
     ["Occupation:", "Software Engineer (QA → SWE)"],
-    ["Zodiac sign:", "Your sign"]
+    ["Zodiac sign:", "Aries"]
   ],
   interests: [
     ["General:", "Vectrex homebrew, retro games"],
@@ -263,9 +268,10 @@ const PROFILE = {
     "A second paragraph works too."
   ],
   meet: "Write who you\u2019d like to meet here.",
-  // Top 8: GitHub usernames. Photos come from their GitHub avatars.
-  top8: ["octocat", "torvalds", "gaearon", "sindresorhus",
-         "tj", "addyosmani", "kentcdodds", "wesbos"]
+  // Top 8 fills itself from your GitHub followers and following
+  // (people who are both come first). To force someone into a spot,
+  // add their username here, e.g. ["octocat"].
+  pinnedFriends: []
 };
 /* ========================================================= */
 
@@ -276,6 +282,7 @@ document.querySelectorAll("[data-name]").forEach(el => el.textContent = PROFILE.
 document.title = PROFILE.name + "\u2019s Profile | zer0space";
 $("avatar").src = gh + ".png?size=240";
 $("tagline").textContent = PROFILE.tagline;
+$("headline").textContent = PROFILE.headline;
 $("location").textContent = PROFILE.location;
 $("nav-github").href = gh;
 $("c-follow").href = gh;
@@ -311,23 +318,29 @@ fillTable("interests", PROFILE.interests);
 PROFILE.aboutMe.forEach(t => { const p = document.createElement("p"); p.textContent = t; $("aboutMe").append(p); });
 $("meet").textContent = PROFILE.meet;
 
-// Music player — plays only when clicked (browsers block autoplay)
+// Music player — loads the YouTube video when play is clicked
 $("songTitle").textContent = PROFILE.song.title;
 $("songArtist").textContent = PROFILE.song.artist;
-const audio = PROFILE.song.file ? new Audio(PROFILE.song.file) : null;
-if (!audio) { $("playBtn").disabled = true; $("songArtist").textContent = "No song added yet"; }
+$("songLink").href = "https://www.youtube.com/watch?v=" + PROFILE.song.youtube;
+let songOn = false;
 $("playBtn").addEventListener("click", () => {
-  if (audio.paused) {
-    audio.play().catch(() => { $("songArtist").textContent = "Couldn\u2019t load " + PROFILE.song.file; });
-  } else audio.pause();
+  songOn = !songOn;
+  const v = $("video");
+  if (songOn) {
+    const f = document.createElement("iframe");
+    f.src = "https://www.youtube-nocookie.com/embed/" + PROFILE.song.youtube + "?autoplay=1";
+    f.title = PROFILE.song.title + " by " + PROFILE.song.artist;
+    f.allow = "autoplay; encrypted-media; picture-in-picture";
+    f.allowFullscreen = true;
+    v.replaceChildren(f); v.hidden = false;
+  } else { v.replaceChildren(); v.hidden = true; }
+  $("player").classList.toggle("playing", songOn);
+  $("playBtn").textContent = songOn ? "■" : "▶";
+  $("playBtn").setAttribute("aria-label", songOn ? "Stop" : "Play");
 });
-if (audio) {
-  audio.addEventListener("play",  () => { $("player").classList.add("playing");    $("playBtn").textContent = "❚❚"; $("playBtn").setAttribute("aria-label", "Pause"); });
-  audio.addEventListener("pause", () => { $("player").classList.remove("playing"); $("playBtn").textContent = "▶";  $("playBtn").setAttribute("aria-label", "Play"); });
-}
 
-// Top 8
-PROFILE.top8.slice(0, 8).forEach(user => {
+// Top 8 — built from GitHub followers + following
+function addFriend(user) {
   const a = document.createElement("a");
   a.href = "https://github.com/" + user; a.target = "_blank"; a.rel = "noopener";
   a.textContent = user;
@@ -336,14 +349,23 @@ PROFILE.top8.slice(0, 8).forEach(user => {
   img.alt = ""; img.loading = "lazy";
   a.append(img);
   $("top8").append(a);
-});
+}
+const api = "https://api.github.com/users/" + PROFILE.github;
+const getLogins = url => fetch(url).then(r => r.ok ? r.json() : []).then(list => list.map(u => u.login));
+Promise.all([getLogins(api + "/followers?per_page=100"), getLogins(api + "/following?per_page=100")])
+  .then(([followers, following]) => {
+    const mutual = followers.filter(u => following.includes(u));
+    const everyone = [...new Set([...PROFILE.pinnedFriends, ...mutual, ...followers, ...following])];
+    $("friendCount").textContent = everyone.length;
+    if (!everyone.length) {
+      $("top8").outerHTML = '<p class="small">No friends yet. Follow some people on GitHub and they\u2019ll show up here.</p>';
+      return;
+    }
+    everyone.slice(0, 8).forEach(addFriend);
+  })
+  .catch(() => { $("friendCount").textContent = "?"; });
 
 // Live data from GitHub: follower count, last activity, latest repos
-const api = "https://api.github.com/users/" + PROFILE.github;
-fetch(api).then(r => r.json()).then(u => {
-  $("friendCount").textContent = (u.followers ?? 0) + (u.following ?? 0);
-}).catch(() => { $("friendCount").textContent = PROFILE.top8.length; });
-
 fetch(api + "/events/public?per_page=1").then(r => r.json()).then(ev => {
   $("lastLogin").textContent = ev[0] ? new Date(ev[0].created_at).toLocaleDateString() : "a while ago";
 }).catch(() => { $("lastLogin").textContent = "a while ago"; });
