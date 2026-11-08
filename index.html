@@ -50,45 +50,64 @@ body {
   padding: 24px 0;
 }
 body { background: #000; }
-/* Black sky: Vectrex-style vector stars (thin glowing lines, white-hot
-   center) in many sizes, drifting from the top left to the bottom right in
-   a gentle wave. All share one color that slowly shifts pink → orange → teal. */
+/* Night sky: deep purple fading to black, a dust of tiny twinkling dots,
+   and glowing cross-shaped stars with white-hot centers that drift from the
+   top left to the bottom right in a gentle wave. All stars share one color
+   that slowly shifts pink → orange → teal. */
 @property --spark { syntax: "<color>"; inherits: true; initial-value: #d9467a; }
 .sky {
-  position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background: #000;
+  position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none;
+  background: linear-gradient(to bottom, #2b0a3d 0%, #1a0626 45%, #0b0210 80%, #000 100%);
   animation: tint 30s ease-in-out infinite;
 }
-.sky b { position: absolute; animation: diag var(--d) linear infinite, flicker .11s steps(2) infinite; animation-delay: var(--delay), 0s; }
+/* Star dust: random tiny dots (drawn by the script below), one layer in the
+   shared color and one in white, twinkling out of step */
+.sky::before, .sky::after {
+  content: ""; position: absolute; inset: 0;
+  -webkit-mask-repeat: repeat; mask-repeat: repeat;
+}
+.sky::before {
+  background: var(--spark);
+  -webkit-mask-image: var(--dust-a); mask-image: var(--dust-a);
+  animation: dust 1.7s ease-in-out infinite alternate;
+}
+.sky::after {
+  background: #fff;
+  -webkit-mask-image: var(--dust-b); mask-image: var(--dust-b);
+  animation: dust 2.3s ease-in-out infinite alternate-reverse;
+}
+.sky b { position: absolute; z-index: 1; animation: diag var(--d) linear infinite, flicker .11s steps(2) infinite; animation-delay: var(--delay), 0s; }
 .sky b i { display: block; animation: wave var(--w) ease-in-out infinite alternate; }
-.sky b i::before {
+.sky b i::before {           /* cross star: thin rays, white core, colored glow */
   content: ""; display: block; width: var(--s); height: var(--s);
   background:
-    radial-gradient(circle, #fff 0 9%, transparent 20%),
-    linear-gradient(to bottom, transparent, var(--spark) 25%, #fff 50%, var(--spark) 75%, transparent) center / 2px 100% no-repeat,
-    linear-gradient(to right,  transparent, var(--spark) 25%, #fff 50%, var(--spark) 75%, transparent) center / 100% 2px no-repeat,
-    linear-gradient(45deg,  transparent 46%, var(--spark) 49%, var(--spark) 51%, transparent 54%) center / 45% 45% no-repeat,
-    linear-gradient(-45deg, transparent 46%, var(--spark) 49%, var(--spark) 51%, transparent 54%) center / 45% 45% no-repeat;
-  filter: drop-shadow(0 0 1.5px var(--spark)) drop-shadow(0 0 calc(var(--s) / 4) var(--spark)) brightness(1.3);
+    radial-gradient(circle, #fff 0 8%, color-mix(in srgb, var(--spark) 60%, #fff) 14%, transparent 24%),
+    linear-gradient(to bottom, transparent, var(--spark) 22%, #fff 50%, var(--spark) 78%, transparent) center / 1.5px 100% no-repeat,
+    linear-gradient(to right,  transparent, var(--spark) 22%, #fff 50%, var(--spark) 78%, transparent) center / 100% 1.5px no-repeat;
+  filter: drop-shadow(0 0 1px var(--spark)) drop-shadow(0 0 calc(var(--s) / 5) var(--spark)) brightness(1.25);
   animation: twinkle var(--t) ease-in-out infinite alternate;
+  animation-delay: var(--td);
 }
 @keyframes diag    { from { transform: translate(-60vmax, -60vmax); } to { transform: translate(60vmax, 60vmax); } }
 @keyframes wave    { from { transform: translate(var(--a), calc(var(--a) * -1)); } to { transform: translate(calc(var(--a) * -1), var(--a)); } }
-@keyframes twinkle { 0% { opacity: .4; transform: scale(.65) rotate(0deg); } 100% { opacity: 1; transform: scale(1.15) rotate(45deg); } }
-@keyframes flicker { 0% { opacity: 1; } 100% { opacity: .82; } }   /* faint CRT flicker */
+@keyframes twinkle { 0% { opacity: .1; transform: scale(.45); } 60% { opacity: .9; } 100% { opacity: 1; transform: scale(1.1); } }
+@keyframes dust    { 0% { opacity: .35; } 100% { opacity: 1; } }
+@keyframes flicker { 0% { opacity: 1; } 100% { opacity: .85; } }
 @keyframes tint {
-  0%, 100% { --spark: #d9467a; }
+  0%, 100% { --spark: #e0559a; }
   33%      { --spark: #f08a3c; }
-  66%      { --spark: #1a9e9a; }
+  66%      { --spark: #1fb3ae; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .sky, .sky b, .sky b i, .sky b i::before { animation: none; }
+  .sky, .sky::before, .sky::after, .sky b, .sky b i, .sky b i::before { animation: none; }
 }
 
 
 a { color: var(--link); }
 a:hover { color: var(--orange-text); }
 a:focus-visible, button:focus-visible { outline: 2px solid var(--orange-text); outline-offset: 2px; }
-.wrap { max-width: 820px; margin: 0 auto; background: var(--sheet); border-radius: 6px; overflow: hidden; box-shadow: 0 0 40px rgba(217,70,122,.25), 0 0 80px rgba(26,158,154,.15); }
+.wrap { max-width: 820px; margin: 0 auto; }
+.topbar { border-radius: 6px; overflow: hidden; margin: 0 10px; box-shadow: 0 0 30px rgba(0,0,0,.6); }
 
 /* Header */
 header { background: var(--header); color: var(--header-text); padding: 10px 12px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
@@ -103,11 +122,11 @@ nav a:last-child { border-right: 0; }
 nav a:hover { text-decoration: underline; color: #fff; }
 
 /* Two-column profile */
-.main { display: grid; grid-template-columns: 300px 1fr; gap: 16px; padding: 14px; }
-@media (max-width: 680px) { .main { grid-template-columns: 1fr; } .search { margin-left: 0; } }
+.main { display: grid; grid-template-columns: 300px 1fr; gap: 16px; padding: 14px 10px; }
+@media (max-width: 680px) { .main { grid-template-columns: 1fr; gap: 0; padding: 18px 18px; } .search { margin-left: 0; } .topbar { margin: 0 18px; } .box, .card, .network { margin-bottom: 22px; } }
 
 h1.name { font-size: 18px; margin: 0 0 8px; }
-.profile { display: flex; gap: 10px; margin-bottom: 12px; }
+.profile { display: flex; gap: 10px; }
 .profile img { width: 120px; height: 120px; object-fit: cover; border: 1px solid var(--border); }
 .profile p { margin: 0 0 3px; }
 .tagline { font-style: italic; margin-bottom: 8px !important; }
@@ -118,7 +137,9 @@ h1.name { font-size: 18px; margin: 0 0 8px; }
 .small { font-size: 10px; color: var(--muted); }
 
 /* Boxes */
-.box { border: 1px solid var(--border); margin-bottom: 12px; }
+.box, .card, .network { background: var(--sheet); border-radius: 6px; overflow: hidden; box-shadow: 0 0 18px rgba(0,0,0,.55); }
+.box { border: 1px solid var(--border); margin-bottom: 14px; }
+.card { padding: 10px; margin-bottom: 14px; }
 .box h2 { margin: 0; font-size: 12px; padding: 3px 6px; background: var(--box-blue); color: #fff; }
 .box.orange h2 { background: var(--box-orange); color: var(--orange-text); }
 .box.orange { border-color: #f3c3a2; }
@@ -146,7 +167,7 @@ table.details td { background: var(--box-blue-light); }
 .video iframe { width: 100%; height: 100%; border: 0; display: block; }
 
 /* Right column */
-.network { border: 1px solid var(--border); padding: 12px; text-align: center; font-size: 14px; font-weight: bold; margin-bottom: 12px; }
+.network { border: 1px solid var(--border); padding: 12px; text-align: center; font-size: 14px; font-weight: bold; margin-bottom: 14px; }
 .blog li { margin-bottom: 4px; }
 .blurbs h3 { color: var(--orange-text); font-size: 12px; margin: 8px 0 3px; }
 .blurbs p { margin: 0 0 8px; }
@@ -154,12 +175,13 @@ table.details td { background: var(--box-blue-light); }
 @media (max-width: 420px) { .top8 { grid-template-columns: repeat(2, 1fr); } }
 .top8 a { font-size: 11px; font-weight: bold; text-decoration: none; display: block; overflow-wrap: anywhere; }
 .top8 img { width: 100%; max-width: 90px; aspect-ratio: 1; object-fit: cover; display: block; margin: 3px auto 0; border: 1px solid var(--border); }
-footer { text-align: center; padding: 14px; font-size: 10px; color: var(--muted); }
+footer { text-align: center; padding: 14px; font-size: 10px; color: #c9d1d6; text-shadow: 0 1px 3px #000; }
 </style>
 </head>
 <body>
 <div class="sky" aria-hidden="true" id="sky"></div>
 <div class="wrap">
+  <div class="topbar">
   <header>
     <a class="logo" href="#">zer0<span>space</span></a>
     <form class="search" onsubmit="event.preventDefault(); window.open('https://github.com/search?q=' + encodeURIComponent(this.q.value));">
@@ -175,10 +197,12 @@ footer { text-align: center; padding: 14px; font-size: 10px; color: var(--muted)
     <a href="#comments">Comments</a>
     <a id="nav-github" href="#">GitHub</a>
   </nav>
+  </div>
 
   <div class="main">
     <!-- ===== LEFT COLUMN ===== -->
     <div>
+      <div class="card">
       <h1 class="name" data-name></h1>
       <div class="profile">
         <img id="avatar" alt="Profile picture">
@@ -189,6 +213,7 @@ footer { text-align: center; padding: 14px; font-size: 10px; color: var(--muted)
           <p class="online">Online Now!</p>
           <p class="small">Last commit: <span id="lastLogin">checking…</span></p>
         </div>
+      </div>
       </div>
 
       <div class="box contact">
@@ -276,20 +301,36 @@ footer { text-align: center; padding: 14px; font-size: 10px; color: var(--muted)
 </div>
 
 <script>
+// Star dust: random dot tiles used as masks for the two dust layers
+(() => {
+  const sky = document.getElementById("sky");
+  const tile = (w, h, n, rMax) => {
+    let dots = "";
+    for (let k = 0; k < n; k++) {
+      const r = (0.4 + Math.random() * rMax).toFixed(2);
+      const o = (0.4 + Math.random() * 0.6).toFixed(2);
+      dots += '<circle cx="' + (Math.random() * w).toFixed(1) + '" cy="' + (Math.random() * h).toFixed(1) + '" r="' + r + '" fill-opacity="' + o + '"/>';
+    }
+    return 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">' + dots + '</svg>') + '")';
+  };
+  sky.style.setProperty("--dust-a", tile(431, 397, 140, 1.1));
+  sky.style.setProperty("--dust-b", tile(383, 419, 55, 0.8));
+})();
+
 // Sparkles: change SPARKLES for more or fewer
-const SPARKLES = 200;
+const SPARKLES = 260;
 (() => {
   const sky = document.getElementById("sky");
   const rnd = (min, max) => min + Math.random() * (max - min);
   for (let n = 0; n < SPARKLES; n++) {
     const b = document.createElement("b"), i = document.createElement("i");
-    const size = 6 + Math.pow(Math.random(), 2.2) * 26;   // mostly small, a few big
+    const size = 5 + Math.pow(Math.random(), 3) * 26;   // mostly small, a few big
     const dur = rnd(45, 90);
     b.style.cssText =
       "left:" + rnd(-20, 120) + "vw;top:" + rnd(-20, 120) + "vh;" +
       "--d:" + dur + "s;--delay:" + (-rnd(0, dur)) + "s;" +
       "--w:" + rnd(4, 9) + "s;--a:" + rnd(10, 40) + "px;" +
-      "--s:" + size + "px;--t:" + rnd(1.2, 3.5) + "s;";
+      "--s:" + size + "px;--t:" + rnd(.8, 2.8) + "s;--td:" + (-rnd(0, 3)) + "s;";
     b.append(i); sky.append(b);
   }
 })();
@@ -301,7 +342,7 @@ const PROFILE = {
   name: "Natalie",
   headline: "Senior QA Engineer / SDET",                             // line under your tagline
   github: "zer0charisma",
-  tagline: "\u201CLemme just test this real quick.\u201D",   // your tagline here
+  tagline: "\u201CTesting in production since 2006.\u201D",   // your tagline here
   location: "Austin, TX",                              // or "" to hide
   email: "",            // e.g. "you@example.com" — leave "" to hide the link
   linkedin: "https://www.linkedin.com/in/natalie-rees-no13/",         // e.g. "https://www.linkedin.com/in/yourname"
