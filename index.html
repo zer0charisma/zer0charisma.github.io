@@ -260,7 +260,7 @@ footer { text-align: center; padding: 14px; font-size: 10px; color: #c9d1d6; tex
 <script>
 // ===== Star globe =====
 // STARS = big cross stars, DUST = tiny dots. ROLL_SECONDS = time for one full turn.
-const STARS = 800, DUST = 9000, ROLL_SECONDS = 150;
+const STARS = 1100, DUST = 14000, ROLL_SECONDS = 150;
 // TILT tips the roll axis: -45 makes the near stars travel from top left to bottom right.
 const TILT = -45;
 (() => {
@@ -336,7 +336,9 @@ const TILT = -45;
     const cx = m.width ? m.left + 5 : W / 2;
     const cy = m.width ? Math.max(.2 * H, Math.min(.8 * H, m.top + m.height / 2)) : H / 2;
 
-    const R = Math.max(W, H) * 1.25, D = R * 1.1, F = R * 1.6;           // globe size, depth, lens
+    // Size the globe from the farthest screen corner so stars always reach every edge
+    const far = Math.max(Math.hypot(cx, cy), Math.hypot(W - cx, cy), Math.hypot(cx, H - cy), Math.hypot(W - cx, H - cy));
+    const R = Math.max(far * 1.75, Math.max(W, H) * 1.25), D = R * 1.1, F = R * 1.6;   // globe size, depth, lens
     const a = still ? .6 : -(t / ROLL_SECONDS) * Math.PI * 2;          // negative = top rolls toward you
     const ca = Math.cos(a), sa = Math.sin(a);
     const tilt = TILT * Math.PI / 180, ct = Math.cos(tilt), st = Math.sin(tilt);
@@ -412,7 +414,7 @@ const PROFILE = {
   // add their username here, e.g. ["octocat"].
   pinnedFriends: [],
   // Everyone's first friend. Always first in your Top 8.
-  tom: { name: "Tom", href: "https://en.wikipedia.org/wiki/Tom_Anderson", photo: "tom_from_myspace.jpeg" }
+  tom: { name: "Tom", href: "https://en.wikipedia.org/wiki/Tom_Anderson", photo: "" }
 };
 /* ========================================================= */
 
