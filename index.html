@@ -50,57 +50,14 @@ body {
   padding: 24px 0;
 }
 body { background: #000; }
-/* Night sky: deep purple fading to black, a dust of tiny twinkling dots,
-   and glowing cross-shaped stars with white-hot centers that drift from the
-   top left to the bottom right in a gentle wave. All stars share one color
-   that slowly shifts pink → orange → teal. */
-@property --spark { syntax: "<color>"; inherits: true; initial-value: #d9467a; }
+/* Night sky: deep purple fading to black. The stars are drawn by the script
+   on a canvas: a globe of stars rolling forward around a horizontal axis that
+   sits behind the page, level with the N in "Natalie's Blurbs". */
 .sky {
   position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none;
   background: linear-gradient(to bottom, #2b0a3d 0%, #1a0626 45%, #0b0210 80%, #000 100%);
-  animation: tint 30s ease-in-out infinite;
 }
-/* Star dust: random tiny dots (drawn by the script below), one layer in the
-   shared color and one in white, twinkling out of step */
-.sky::before, .sky::after {
-  content: ""; position: absolute; inset: 0;
-  -webkit-mask-repeat: repeat; mask-repeat: repeat;
-}
-.sky::before {
-  background: var(--spark);
-  -webkit-mask-image: var(--dust-a); mask-image: var(--dust-a);
-  animation: dust 1.7s ease-in-out infinite alternate;
-}
-.sky::after {
-  background: #fff;
-  -webkit-mask-image: var(--dust-b); mask-image: var(--dust-b);
-  animation: dust 2.3s ease-in-out infinite alternate-reverse;
-}
-.sky b { position: absolute; z-index: 1; animation: diag var(--d) linear infinite, flicker .11s steps(2) infinite; animation-delay: var(--delay), 0s; }
-.sky b i { display: block; animation: wave var(--w) ease-in-out infinite alternate; }
-.sky b i::before {           /* cross star: thin rays, white core, colored glow */
-  content: ""; display: block; width: var(--s); height: var(--s);
-  background:
-    radial-gradient(circle, #fff 0 8%, color-mix(in srgb, var(--spark) 60%, #fff) 14%, transparent 24%),
-    linear-gradient(to bottom, transparent, var(--spark) 22%, #fff 50%, var(--spark) 78%, transparent) center / 1.5px 100% no-repeat,
-    linear-gradient(to right,  transparent, var(--spark) 22%, #fff 50%, var(--spark) 78%, transparent) center / 100% 1.5px no-repeat;
-  filter: drop-shadow(0 0 1px var(--spark)) drop-shadow(0 0 calc(var(--s) / 5) var(--spark)) brightness(1.25);
-  animation: twinkle var(--t) ease-in-out infinite alternate;
-  animation-delay: var(--td);
-}
-@keyframes diag    { from { transform: translate(-60vmax, -60vmax); } to { transform: translate(60vmax, 60vmax); } }
-@keyframes wave    { from { transform: translate(var(--a), calc(var(--a) * -1)); } to { transform: translate(calc(var(--a) * -1), var(--a)); } }
-@keyframes twinkle { 0% { opacity: .1; transform: scale(.45); } 60% { opacity: .9; } 100% { opacity: 1; transform: scale(1.1); } }
-@keyframes dust    { 0% { opacity: .35; } 100% { opacity: 1; } }
-@keyframes flicker { 0% { opacity: 1; } 100% { opacity: .85; } }
-@keyframes tint {
-  0%, 100% { --spark: #e0559a; }
-  33%      { --spark: #f08a3c; }
-  66%      { --spark: #1fb3ae; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .sky, .sky::before, .sky::after, .sky b, .sky b i, .sky b i::before { animation: none; }
-}
+.sky canvas { display: block; width: 100%; height: 100%; }
 
 
 a { color: var(--link); }
@@ -179,7 +136,7 @@ footer { text-align: center; padding: 14px; font-size: 10px; color: #c9d1d6; tex
 </style>
 </head>
 <body>
-<div class="sky" aria-hidden="true" id="sky"></div>
+<div class="sky" aria-hidden="true" id="sky"><canvas id="stars"></canvas></div>
 <div class="wrap">
   <div class="topbar">
   <header>
@@ -266,7 +223,7 @@ footer { text-align: center; padding: 14px; font-size: 10px; color: #c9d1d6; tex
       </div>
 
       <div class="box orange blurbs">
-        <h2><span data-name></span>’s Blurbs</h2>
+        <h2><span data-name id="axisMark"></span>’s Blurbs</h2>
         <div class="in">
           <h3>About me:</h3>
           <div id="aboutMe"></div>
@@ -301,38 +258,121 @@ footer { text-align: center; padding: 14px; font-size: 10px; color: #c9d1d6; tex
 </div>
 
 <script>
-// Star dust: random dot tiles used as masks for the two dust layers
+// ===== Star globe =====
+// STARS = big cross stars, DUST = tiny dots. ROLL_SECONDS = time for one full turn.
+const STARS = 800, DUST = 9000, ROLL_SECONDS = 150;
+// TILT tips the roll axis: -45 makes the near stars travel from top left to bottom right.
+const TILT = -45;
 (() => {
-  const sky = document.getElementById("sky");
-  const tile = (w, h, n, rMax) => {
-    let dots = "";
-    for (let k = 0; k < n; k++) {
-      const r = (0.4 + Math.random() * rMax).toFixed(2);
-      const o = (0.4 + Math.random() * 0.6).toFixed(2);
-      dots += '<circle cx="' + (Math.random() * w).toFixed(1) + '" cy="' + (Math.random() * h).toFixed(1) + '" r="' + r + '" fill-opacity="' + o + '"/>';
-    }
-    return 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">' + dots + '</svg>') + '")';
-  };
-  sky.style.setProperty("--dust-a", tile(431, 397, 140, 1.1));
-  sky.style.setProperty("--dust-b", tile(383, 419, 55, 0.8));
-})();
+  const canvas = document.getElementById("stars");
+  const ctx = canvas.getContext("2d");
+  const mark = document.getElementById("axisMark");
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const rnd = (a, b) => a + Math.random() * (b - a);
 
-// Sparkles: change SPARKLES for more or fewer
-const SPARKLES = 260;
-(() => {
-  const sky = document.getElementById("sky");
-  const rnd = (min, max) => min + Math.random() * (max - min);
-  for (let n = 0; n < SPARKLES; n++) {
-    const b = document.createElement("b"), i = document.createElement("i");
-    const size = 5 + Math.pow(Math.random(), 3) * 26;   // mostly small, a few big
-    const dur = rnd(45, 90);
-    b.style.cssText =
-      "left:" + rnd(-20, 120) + "vw;top:" + rnd(-20, 120) + "vh;" +
-      "--d:" + dur + "s;--delay:" + (-rnd(0, dur)) + "s;" +
-      "--w:" + rnd(4, 9) + "s;--a:" + rnd(10, 40) + "px;" +
-      "--s:" + size + "px;--t:" + rnd(.8, 2.8) + "s;--td:" + (-rnd(0, 3)) + "s;";
-    b.append(i); sky.append(b);
-  }
+  // Points spread evenly over a sphere
+  const onSphere = () => {
+    const z = rnd(-1, 1), t = rnd(0, Math.PI * 2), k = Math.sqrt(1 - z * z);
+    return { x: k * Math.cos(t), y: k * Math.sin(t), z };
+  };
+  const stars = Array.from({ length: STARS }, () => ({
+    ...onSphere(), size: 4 + Math.pow(Math.random(), 3.5) * 24,
+    ph: rnd(0, 6.28), sp: rnd(2.2, 7)
+  }));
+  const dust = Array.from({ length: DUST }, () => ({
+    ...onSphere(), size: rnd(1, 2.6), white: Math.random() < .25,
+    ph: rnd(0, 6.28), sp: rnd(1.5, 4)
+  }));
+
+  // Shared color: pink → orange → teal → pink over 30 s
+  const palette = [[255, 40, 150], [255, 120, 20], [0, 220, 205]];
+  const colorAt = t => {
+    const f = (t / 10) % 3, i = Math.floor(f), m = f - i, e = m * m * (3 - 2 * m);
+    const a = palette[i], b = palette[(i + 1) % 3];
+    return a.map((v, j) => Math.round(v + (b[j] - v) * e));
+  };
+
+  // Star sprite (re-drawn when the color shifts)
+  const sprite = document.createElement("canvas"), S = 64;
+  sprite.width = sprite.height = S;
+  const sctx = sprite.getContext("2d");
+  let spriteKey = "";
+  const drawSprite = ([r, g, b]) => {
+    const c = `${r},${g},${b}`;
+    if (c === spriteKey) return; spriteKey = c;
+    sctx.clearRect(0, 0, S, S);
+    const h = S / 2;
+    let gr = sctx.createRadialGradient(h, h, 0, h, h, h * .55);          // glow
+    gr.addColorStop(0, `rgba(${c},.85)`); gr.addColorStop(.5, `rgba(${c},.3)`); gr.addColorStop(1, `rgba(${c},0)`);
+    sctx.fillStyle = gr; sctx.fillRect(0, 0, S, S);
+    for (const vertical of [true, false]) {                             // rays
+      gr = vertical ? sctx.createLinearGradient(h, 0, h, S) : sctx.createLinearGradient(0, h, S, h);
+      gr.addColorStop(0, `rgba(${c},0)`); gr.addColorStop(.3, `rgba(${c},1)`);
+      gr.addColorStop(.44, `rgba(${c},1)`); gr.addColorStop(.5, "#fff"); gr.addColorStop(.56, `rgba(${c},1)`); gr.addColorStop(.7, `rgba(${c},1)`); gr.addColorStop(1, `rgba(${c},0)`);
+      sctx.fillStyle = gr;
+      vertical ? sctx.fillRect(h - 1, 0, 2, S) : sctx.fillRect(0, h - 1, S, 2);
+    }
+    gr = sctx.createRadialGradient(h, h, 0, h, h, h * .12);             // white-hot core
+    gr.addColorStop(0, "#fff"); gr.addColorStop(.5, "rgba(255,255,255,.9)"); gr.addColorStop(1, `rgba(${c},0)`);
+    sctx.fillStyle = gr; sctx.fillRect(0, 0, S, S);
+  };
+
+  let W, H, dpr;
+  const resize = () => {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  };
+  addEventListener("resize", resize); resize();
+
+  const frame = now => {
+    const t = now / 1000;
+    const col = colorAt(t); drawSprite(col);
+    ctx.clearRect(0, 0, W, H);
+
+    // Axis: level with the N in "Natalie's Blurbs" (kept near the screen so stars always surround you)
+    const m = mark.getBoundingClientRect();
+    const cx = m.width ? m.left + 5 : W / 2;
+    const cy = m.width ? Math.max(.2 * H, Math.min(.8 * H, m.top + m.height / 2)) : H / 2;
+
+    const R = Math.max(W, H) * 1.25, D = R * 1.1, F = R * 1.6;           // globe size, depth, lens
+    const a = still ? .6 : -(t / ROLL_SECONDS) * Math.PI * 2;          // negative = top rolls toward you
+    const ca = Math.cos(a), sa = Math.sin(a);
+    const tilt = TILT * Math.PI / 180, ct = Math.cos(tilt), st = Math.sin(tilt);
+    const project = p => {
+      const y = p.y * ca - p.z * sa, z = p.y * sa + p.z * ca;          // roll around the axis
+      const X = p.x * ct - y * st, Y = p.x * st + y * ct;               // tip the axis diagonally
+      const k = F / (F + D - z * R);                                    // perspective
+      return { x: cx + X * R * k, y: cy + Y * R * k, k, z };
+    };
+
+    const dustCol = `rgb(${col.map(v => Math.round(v + (255 - v) * .1))})`;
+    ctx.globalCompositeOperation = "lighter";
+    for (const p of dust) {
+      const q = project(p);
+      if (q.x < -5 || q.x > W + 5 || q.y < -5 || q.y > H + 5) continue;
+      const tw = still ? .85 : .5 + .5 * (.5 + .5 * Math.sin(t * p.sp + p.ph));
+      ctx.globalAlpha = tw * Math.min(1, .6 + q.k * .6);
+      ctx.fillStyle = p.white ? "#fff" : dustCol;
+      const s = p.size * Math.max(.6, q.k);
+      ctx.fillRect(q.x - s / 2, q.y - s / 2, s, s);
+    }
+    ctx.globalCompositeOperation = "source-over";
+    for (const p of stars) {
+      const q = project(p);
+      const s = p.size * q.k * 2.7;
+      if (q.x < -s || q.x > W + s || q.y < -s || q.y > H + s) continue;
+      const tw = still ? .9 : .45 + .55 * (.5 + .5 * Math.sin(t * p.sp + p.ph));
+      const flicker = still ? 1 : .85 + Math.random() * .15;
+      ctx.globalAlpha = tw * flicker * Math.min(1, .5 + q.k * .9);
+      const ss = s * (.6 + .5 * tw);
+      ctx.drawImage(sprite, q.x - ss / 2, q.y - ss / 2, ss, ss);
+    }
+    ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1;
+    if (!still) requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
 })();
 
 /* =========================================================
