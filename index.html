@@ -133,14 +133,120 @@ table.details td { background: var(--box-blue-light); }
 .top8 a { font-size: 11px; font-weight: bold; text-decoration: none; display: block; overflow-wrap: anywhere; }
 .top8 img { width: 100%; max-width: 90px; aspect-ratio: 1; object-fit: cover; display: block; margin: 3px auto 0; border: 1px solid var(--border); }
 footer { text-align: center; padding: 14px; font-size: 10px; color: #c9d1d6; text-shadow: 0 1px 3px #000; }
+
+/* =================== MAX MODE: peak-2006 extras ===================
+   Everything below only applies while <body class="max">. The button in
+   the header toggles it, so you can switch to a clean look any time. */
+.modeBtn { font: bold 11px Verdana, sans-serif; padding: 3px 8px; border-radius: 10px; cursor: pointer;
+  border: 1px solid #fff; background: transparent; color: #fff; }
+.max .modeBtn { background: linear-gradient(90deg, #ff2896, #ff7814, #00dccd); border-color: #fff; text-shadow: 0 1px 1px #000; }
+.max-only { display: none; }
+.max .max-only { display: block; }
+
+/* Glitter text: a shimmering sweep across colored letters */
+.max .glitter {
+  background: linear-gradient(100deg, #ff2896 0%, #ffd1ea 18%, #ff7814 32%, #fff 40%, #00dccd 55%, #ff2896 75%, #fff 82%, #ff7814 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: glitter 4s linear infinite;
+  filter: drop-shadow(0 0 1px rgba(255,255,255,.6));
+}
+@keyframes glitter { to { background-position: -250% 0; } }
+.max h1.name { font: 900 26px/1.1 Impact, "Arial Black", sans-serif; letter-spacing: 1px; }
+.max .logo { font-family: Impact, "Arial Black", sans-serif; letter-spacing: 0; }
+
+/* Checkered banner: black-and-white checks with a row of yellow symbols, both scrolling */
+.ticker { overflow: hidden; white-space: nowrap; height: 28px; display: flex; align-items: center;
+  border-top: 3px solid #ff2896; border-bottom: 3px solid #00dccd;
+  background: repeating-conic-gradient(#000 0 25%, #fff 0 50%) 0 0 / 14px 14px;
+  animation: checks 1.2s linear infinite; }
+.ticker span { flex: none; display: flex; align-items: center; height: 100%;
+  font: 24px/1 "Segoe UI Symbol", "Apple Symbols", Verdana, sans-serif; letter-spacing: 2px; padding-right: 2px;
+  background: repeating-linear-gradient(90deg, #ff2896 0, #ff7814 100px, #ff2896 200px, #00dccd 300px, #ff2896 400px);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(1px 0 0 #000) drop-shadow(-1px 0 0 #000) drop-shadow(0 1px 0 #000) drop-shadow(0 -1px 0 #000);
+  animation: tick 24s linear infinite; }
+@keyframes tick { to { transform: translateX(-100%); } }
+@keyframes checks { to { background-position: 28px 0; } }
+
+/* Rainbow, double-bordered boxes with a faint star pattern */
+.max .box, .max .card, .max .network { border: 3px double transparent;
+  background:
+    linear-gradient(var(--sheet), var(--sheet)) padding-box,
+    linear-gradient(90deg, #ff2896, #ff7814, #ffd23c, #00dccd, #8a5cff, #ff2896) border-box;
+  background-size: auto, 300% 100%; animation: borderflow 6s linear infinite; }
+@keyframes borderflow { to { background-position: 0 0, 300% 0; } }
+.max .box .in, .max .contact ul {
+  background-image: radial-gradient(circle, rgba(255,40,150,.10) 1px, transparent 1.6px),
+                    radial-gradient(circle, rgba(0,220,205,.10) 1px, transparent 1.6px);
+  background-size: 18px 18px, 18px 18px; background-position: 0 0, 9px 9px; }
+.max .box h2 { background: linear-gradient(90deg, #8a0f5c, #1a7f7c); color: #fff; font: bold 13px Verdana, sans-serif;
+  text-shadow: 0 0 6px rgba(255,255,255,.6); position: relative; overflow: hidden; }
+.max .box.orange h2 { background: linear-gradient(90deg, #ff2896, #ff7814); color: #fff; }
+.max .box h2::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%);
+  background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.55) 50%, transparent 70%);
+  animation: shine 3.5s ease-in-out infinite; }
+@keyframes shine { 60%, 100% { transform: translateX(100%); } }
+
+/* Profile pic with an animated rainbow frame */
+.max .profile img { border: 3px solid transparent;
+  background: linear-gradient(135deg, #ff2896, #ffd23c, #00dccd, #8a5cff) border-box; background-size: 300% 300%;
+  animation: borderflow 5s linear infinite; }
+
+/* Blinking Online Now */
+.max .online { animation: blinktext 1s steps(2) infinite; }
+@keyframes blinktext { 50% { opacity: .35; } }
+
+/* 88x31 "blinkies" */
+.blinkies { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; padding: 8px; }
+.blinky { width: 88px; height: 31px; display: flex; align-items: center; justify-content: center; text-align: center;
+  font: bold 9px/1.1 Verdana, sans-serif; color: #fff; border: 1px solid #fff; outline: 1px solid #000;
+  text-shadow: 1px 1px 0 #000; animation: blinky 1.2s steps(2) infinite; }
+.blinky:nth-child(2n) { animation-delay: .6s; }
+@keyframes blinky { 50% { filter: brightness(1.5) saturate(1.3); } }
+.b1 { background: repeating-linear-gradient(45deg, #ff2896 0 6px, #c4126d 6px 12px); }
+.b2 { background: linear-gradient(#00dccd, #08766f); }
+.b3 { background: repeating-linear-gradient(90deg, #ff7814 0 4px, #ffd23c 4px 8px); color: #000; text-shadow: none; }
+.b4 { background: #000; color: #39ff14; font-family: "Courier New", monospace; }
+.b5 { background: linear-gradient(90deg, #8a5cff, #ff2896); }
+.b6 { background: repeating-linear-gradient(0deg, #1e2a33 0 3px, #2b4150 3px 6px); color: #ffd23c; }
+
+/* Visitor counter */
+.counter { text-align: center; font-size: 11px; padding: 8px; }
+.counter .digits { display: inline-flex; gap: 2px; margin-top: 4px; }
+.counter .digits i { font: bold 16px "Courier New", monospace; font-style: normal; color: #39ff14; background: #000;
+  padding: 2px 4px; border: 1px solid #555; text-shadow: 0 0 4px #39ff14; }
+
+/* Under construction tape */
+.construction { margin: 0 10px 14px; padding: 6px; text-align: center; font: bold 12px Impact, "Arial Black", sans-serif;
+  letter-spacing: 1px; color: #000; border-radius: 6px;
+  background: repeating-linear-gradient(-45deg, #ffd23c 0 14px, #111 14px 28px); background-size: 200% 100%;
+  animation: tape 2.5s linear infinite; }
+.construction span { background: #ffd23c; padding: 2px 8px; }
+@keyframes tape { to { background-position: 40px 0; } }
+
+/* Wobbly contact links, rainbow scrollbar, sparkle cursor trail */
+.max .contact a:hover { display: inline-block; animation: wobble .5s ease-in-out infinite alternate; }
+@keyframes wobble { from { transform: rotate(-4deg) scale(1.05); } to { transform: rotate(4deg) scale(1.05); } }
+.max { scrollbar-color: #ff2896 #1a0626; }
+.trail { position: fixed; pointer-events: none; z-index: 50; font-size: 14px; color: #fff;
+  text-shadow: 0 0 6px #ff2896, 0 0 10px #ff7814; animation: trail .9s ease-out forwards; }
+@keyframes trail { to { transform: translateY(18px) scale(.3) rotate(90deg); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .max .glitter, .ticker span, .max .box, .max .card, .max .network, .max .box h2::after, .max .profile img,
+  .max .online, .blinky, .construction, .max .contact a:hover { animation: none; }
+  .ticker { animation: none; }
+}
 </style>
 </head>
-<body>
+<body class="max">
 <div class="sky" aria-hidden="true" id="sky"><canvas id="stars"></canvas></div>
 <div class="wrap">
   <div class="topbar">
   <header>
     <a class="logo" href="#">zer0<span>space</span></a>
+    <button class="modeBtn" id="modeBtn" type="button">✨ MAX MODE: ON</button>
     <form class="search" onsubmit="event.preventDefault(); window.open('https://github.com/search?q=' + encodeURIComponent(this.q.value));">
       <input name="q" type="search" aria-label="Search GitHub" placeholder="Search GitHub">
       <button>Search</button>
@@ -154,13 +260,14 @@ footer { text-align: center; padding: 14px; font-size: 10px; color: #c9d1d6; tex
     <a href="#comments">Comments</a>
     <a id="nav-github" href="#">GitHub</a>
   </nav>
+  <div class="ticker max-only" aria-hidden="true"><span>★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ </span><span>★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ </span></div>
   </div>
 
   <div class="main">
     <!-- ===== LEFT COLUMN ===== -->
     <div>
       <div class="card">
-      <h1 class="name" data-name></h1>
+      <h1 class="name glitter" data-name></h1>
       <div class="profile">
         <img id="avatar" alt="Profile picture">
         <div>
@@ -212,7 +319,7 @@ footer { text-align: center; padding: 14px; font-size: 10px; color: #c9d1d6; tex
 
     <!-- ===== RIGHT COLUMN ===== -->
     <div>
-      <div class="network"><span data-name></span> is in your extended network</div>
+      <div class="network"><span class="glitter"><span data-name></span> is in your extended network</span></div>
 
       <div class="box orange blog" id="blog">
         <h2><span data-name></span>’s Latest Blog Entries</h2>
@@ -240,6 +347,19 @@ footer { text-align: center; padding: 14px; font-size: 10px; color: #c9d1d6; tex
         </div>
       </div>
 
+      <div class="box max-only">
+        <h2><span data-name></span>’s Buttons</h2>
+        <div class="blinkies">
+          <div class="blinky b1">QA 4 LIFE ♥</div>
+          <div class="blinky b2">I ♥ PLAYWRIGHT</div>
+          <div class="blinky b3">TESTED IN PROD</div>
+          <div class="blinky b4">&gt; npm test_</div>
+          <div class="blinky b5">VECTREX FAN ★</div>
+          <div class="blinky b6">HAND CODED HTML</div>
+        </div>
+        <div class="counter">You have visited this profile<br><span class="digits" id="visits"></span></div>
+      </div>
+
       <div class="box orange" id="comments">
         <h2><span data-name></span>’s Friends Comments</h2>
         <div class="in">
@@ -254,10 +374,46 @@ footer { text-align: center; padding: 14px; font-size: 10px; color: #c9d1d6; tex
       </div>
     </div>
   </div>
-  <footer>© <span id="year"></span> zer0charisma · hand-built with HTML, nostalgia, and too many GIFs</footer>
+  <div class="construction max-only"><span>🚧 PAGE ALWAYS UNDER CONSTRUCTION 🚧</span></div>
+  <footer>© <span id="year"></span> zer0charisma · tested in production</footer>
 </div>
 
 <script>
+// ===== MAX MODE toggle, visit counter, sparkle trail =====
+(() => {
+  const btn = document.getElementById("modeBtn");
+  const set = on => {
+    document.body.classList.toggle("max", on);
+    btn.textContent = on ? "✨ MAX MODE: ON" : "MAX MODE: OFF";
+    try { localStorage.setItem("maxMode", on ? "1" : "0"); } catch (_) {}
+  };
+  let saved = null;
+  try { saved = localStorage.getItem("maxMode"); } catch (_) {}
+  set(saved !== "0");
+  btn.addEventListener("click", () => set(!document.body.classList.contains("max")));
+
+  // Visit counter: counts this visitor's own visits (stored in their browser)
+  let visits = 1;
+  try { visits = (+localStorage.getItem("visits") || 0) + 1; localStorage.setItem("visits", visits); } catch (_) {}
+  const box = document.getElementById("visits");
+  String(visits).padStart(5, "0").split("").forEach(d => { const i = document.createElement("i"); i.textContent = d; box.append(i); });
+
+  // Sparkle trail behind the mouse (desktop only, skipped for reduced motion)
+  if (matchMedia("(pointer: fine)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    let last = 0;
+    addEventListener("mousemove", e => {
+      if (!document.body.classList.contains("max") || e.timeStamp - last < 40) return;
+      last = e.timeStamp;
+      const s = document.createElement("span");
+      s.className = "trail"; s.textContent = Math.random() < .5 ? "✦" : "✧";
+      s.style.left = e.clientX + (Math.random() * 10 - 5) + "px";
+      s.style.top = e.clientY + (Math.random() * 10 - 5) + "px";
+      document.body.append(s);
+      setTimeout(() => s.remove(), 900);
+    });
+  }
+})();
+
 // ===== Star globe =====
 // STARS = big cross stars, DUST = tiny dots. ROLL_SECONDS = time for one full turn.
 const STARS = 1100, DUST = 14000, ROLL_SECONDS = 150;
