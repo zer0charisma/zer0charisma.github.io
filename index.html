@@ -141,6 +141,7 @@ footer { text-align: center; padding: 14px; font-size: 10px; color: #c9d1d6; tex
   border: 1px solid #fff; background: transparent; color: #fff; }
 .max .modeBtn { background: linear-gradient(90deg, #ff2896, #ff7814, #00dccd); border-color: #fff; text-shadow: 0 1px 1px #000; }
 .max-only { display: none; }
+body:not(.max) .ticker { display: none; }
 .max .max-only { display: block; }
 
 /* Glitter text: a shimmering sweep across colored letters */
@@ -156,18 +157,18 @@ footer { text-align: center; padding: 14px; font-size: 10px; color: #c9d1d6; tex
 .max .logo { font-family: Impact, "Arial Black", sans-serif; letter-spacing: 0; }
 
 /* Checkered banner: black-and-white checks with a row of yellow symbols, both scrolling */
-.ticker { overflow: hidden; white-space: nowrap; height: 28px; display: flex; align-items: center;
+.ticker { overflow: hidden; white-space: nowrap; height: 36px; display: flex; align-items: center;
   border-top: 3px solid #ff2896; border-bottom: 3px solid #00dccd;
-  background: repeating-conic-gradient(#000 0 25%, #fff 0 50%) 0 0 / 14px 14px;
+  background: repeating-conic-gradient(#000 0 25%, #fff 0 50%) 0 0 / 18px 18px;
   animation: checks 1.2s linear infinite; }
 .ticker span { flex: none; display: flex; align-items: center; height: 100%;
-  font: 24px/1 "Segoe UI Symbol", "Apple Symbols", Verdana, sans-serif; letter-spacing: 2px; padding-right: 2px;
-  background: repeating-linear-gradient(90deg, #ff2896 0, #ff7814 100px, #ff2896 200px, #00dccd 300px, #ff2896 400px);
+  font: 32px/1 "Segoe UI Symbol", "Apple Symbols", Verdana, sans-serif; letter-spacing: 3px; padding-right: 2px;
+  background: repeating-linear-gradient(90deg, #ffd23c 0, #ff7814 70px, #ffd23c 140px, #ff2896 210px, #00dccd 280px, #ff2896 350px, #ffd23c 420px);
   -webkit-background-clip: text; background-clip: text; color: transparent;
   filter: drop-shadow(1px 0 0 #000) drop-shadow(-1px 0 0 #000) drop-shadow(0 1px 0 #000) drop-shadow(0 -1px 0 #000);
   animation: tick 24s linear infinite; }
 @keyframes tick { to { transform: translateX(-100%); } }
-@keyframes checks { to { background-position: 28px 0; } }
+@keyframes checks { to { background-position: 36px 0; } }
 
 /* Rainbow, double-bordered boxes with a faint star pattern */
 .max .box, .max .card, .max .network { border: 3px double transparent;
@@ -260,7 +261,7 @@ footer { text-align: center; padding: 14px; font-size: 10px; color: #c9d1d6; tex
     <a href="#comments">Comments</a>
     <a id="nav-github" href="#">GitHub</a>
   </nav>
-  <div class="ticker max-only" aria-hidden="true"><span>★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ </span><span>★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ ★ ✦ ♥ ✧ ☆ ✦ ♥ ✧ </span></div>
+  <div class="ticker max-only" aria-hidden="true"><span>✦ ✧ ★ ✶ ✺ ✧ ✦ ✹ ☆ ✷ ♥ ✦ ✸ ✧ ✵ ★ ✶ ✺ ✧ ✦ ✹ ☆ ✷ ✦ ✸ ✧ ✵ ✦ ✧ ★ ✶ ✺ ✧ ✦ ✹ ☆ ✷ ♥ ✦ ✸ ✧ ✵ ★ ✶ ✺ ✧ ✦ ✹ ☆ ✷ ✦ ✸ ✧ ✵ ✦ ✧ ★ ✶ ✺ ✧ ✦ ✹ ☆ ✷ ♥ ✦ ✸ ✧ ✵ ★ ✶ ✺ ✧ ✦ ✹ ☆ ✷ ✦ ✸ ✧ ✵ ✦ ✧ ★ ✶ ✺ ✧ ✦ ✹ ☆ ✷ ♥ ✦ ✸ ✧ ✵ ★ ✶ ✺ ✧ ✦ ✹ ☆ ✷ ✦ ✸ ✧ ✵ ✦ ✧ ★ ✶ ✺ ✧ ✦ ✹ ☆ ✷ ♥ ✦ ✸ ✧ ✵ ★ ✶ ✺ ✧ ✦ ✹ ☆ ✷ ✦ ✸ ✧ ✵ </span><span>✦ ✧ ★ ✶ ✺ ✧ ✦ ✹ ☆ ✷ ♥ ✦ ✸ ✧ ✵ ★ ✶ ✺ ✧ ✦ ✹ ☆ ✷ ✦ ✸ ✧ ✵ ✦ ✧ ★ ✶ ✺ ✧ ✦ ✹ ☆ ✷ ♥ ✦ ✸ ✧ ✵ ★ ✶ ✺ ✧ ✦ ✹ ☆ ✷ ✦ ✸ ✧ ✵ ✦ ✧ ★ ✶ ✺ ✧ ✦ ✹ ☆ ✷ ♥ ✦ ✸ ✧ ✵ ★ ✶ ✺ ✧ ✦ ✹ ☆ ✷ ✦ ✸ ✧ ✵ ✦ ✧ ★ ✶ ✺ ✧ ✦ ✹ ☆ ✷ ♥ ✦ ✸ ✧ ✵ ★ ✶ ✺ ✧ ✦ ✹ ☆ ✷ ✦ ✸ ✧ ✵ ✦ ✧ ★ ✶ ✺ ✧ ✦ ✹ ☆ ✷ ♥ ✦ ✸ ✧ ✵ ★ ✶ ✺ ✧ ✦ ✹ ☆ ✷ ✦ ✸ ✧ ✵ </span></div>
   </div>
 
   <div class="main">
